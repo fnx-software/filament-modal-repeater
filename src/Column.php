@@ -3,6 +3,7 @@
 namespace YousefAman\ModalRepeater;
 
 use Closure;
+use Illuminate\Support\Arr;
 
 class Column
 {
@@ -17,6 +18,12 @@ class Column
     protected bool $isBadge = false;
 
     protected ?string $badgeColor = null;
+
+    protected array|Closure $extraAttributes = [];
+
+    protected array|Closure $headerAttributes = [];
+
+    protected array|Closure $cellAttributes = [];
 
     public function __construct(
         protected string $name,
@@ -72,6 +79,27 @@ class Column
         return $this;
     }
 
+    public function extraAttributes(array|Closure $attributes): static
+    {
+        $this->extraAttributes = $attributes;
+
+        return $this;
+    }
+
+    public function headerAttributes(array|Closure $attributes): static
+    {
+        $this->headerAttributes = $attributes;
+
+        return $this;
+    }
+
+    public function cellAttributes(array|Closure $attributes): static
+    {
+        $this->cellAttributes = $attributes;
+
+        return $this;
+    }
+
     public function getName(): string
     {
         return $this->name;
@@ -106,6 +134,36 @@ class Column
     public function getBadgeColor(): ?string
     {
         return $this->badgeColor;
+    }
+
+    public function getHeaderAttributes(): array
+    {
+        return array_replace_recursive(
+            $this->getExtraAttributes(),
+            $this->evaluateAttributes($this->headerAttributes),
+        );
+    }
+
+    public function getExtraAttributes(): array
+    {
+        return $this->evaluateAttributes($this->extraAttributes);
+    }
+
+    private function evaluateAttributes(array|Closure $attributes): array
+    {
+        if ($attributes instanceof Closure) {
+            $attributes = ($attributes)();
+        }
+
+        return Arr::wrap($attributes);
+    }
+
+    public function getCellAttributes(): array
+    {
+        return array_replace_recursive(
+            $this->getExtraAttributes(),
+            $this->evaluateAttributes($this->cellAttributes),
+        );
     }
 
     public function resolveValue(mixed $value): mixed
