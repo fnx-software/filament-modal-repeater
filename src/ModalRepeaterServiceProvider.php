@@ -24,7 +24,7 @@ class ModalRepeaterServiceProvider extends PackageServiceProvider
     public function packageBooted(): void
     {
         FilamentAsset::register([
-            Css::make('modal-repeater', __DIR__ . '/../dist/css/modal-repeater.css'),
+            Css::make('modal-repeater', __DIR__.'/../dist/css/modal-repeater.css'),
         ], 'yousefaman/filament-modal-repeater');
     }
 }
