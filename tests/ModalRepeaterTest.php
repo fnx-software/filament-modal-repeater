@@ -1,5 +1,6 @@
 <?php
 
+use Filament\Forms\Components\TextInput;
 use YousefAman\ModalRepeater\Column;
 use YousefAman\ModalRepeater\ModalRepeater;
 
@@ -93,4 +94,17 @@ it('uses name as default label', function () {
     $column = Column::make('first_name');
 
     expect($column->getLabel())->toBe('first_name');
+});
+
+
+it('keeps the schema override compatible with current Filament', function () {
+    $field = TextInput::make('name');
+
+    $repeater = ModalRepeater::make('items')
+        ->schema([$field]);
+
+    expect($repeater->getModalSchema())
+        ->toHaveCount(1)
+        ->and($repeater->getModalSchema()[0])
+        ->toBe($field);
 });
