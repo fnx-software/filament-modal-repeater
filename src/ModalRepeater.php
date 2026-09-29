@@ -6,17 +6,19 @@ use Closure;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Repeater;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Schema;
 use Filament\Support\Enums\Size;
 use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 
 class ModalRepeater extends Repeater
 {
     /** @var array<Column> */
     protected array $displayColumns = [];
 
-    protected array|Closure|null $modalSchema = null;
+    protected mixed $modalSchema = null;
 
     protected int|Closure $modalColumns = 2;
 
@@ -50,7 +52,7 @@ class ModalRepeater extends Repeater
             ?? __('filament-tables::table.empty.heading', ['model' => $this->getLabel()]);
     }
 
-    public function schema(array|Closure|null $schema): static
+    public function schema(mixed $schema): static
     {
         $this->modalSchema = $schema;
 
@@ -95,7 +97,13 @@ class ModalRepeater extends Repeater
 
     public function getModalSchema(): array
     {
-        return $this->evaluate($this->modalSchema) ?? [];
+        $schema = $this->evaluate($this->modalSchema);
+
+        if ($schema instanceof Schema) {
+            return $schema->getComponents();
+        }
+
+        return Arr::wrap($schema);
     }
 
     /**
